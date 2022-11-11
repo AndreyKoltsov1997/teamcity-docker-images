@@ -32,6 +32,8 @@ object image_validation: BuildType(
         }
 
 
+
+
         steps {
             kotlinFile {
                 name = "Image Verification - %docker.deployRepository%teamcity-server:2022.10-linux"
@@ -128,23 +130,16 @@ object image_validation: BuildType(
                 reportOnlyFirstMatch = false
             }
         }
-        triggers {
-            finishBuildTrigger {
-                buildType = "${PublishHubVersion.publish_hub_version.id}"
-            }
-        }
-	dependencies {
-        // Depends on publishing into staging
-		 dependency(AbsoluteId("TC_Trunk_DockerImages_BuildAndPushHosted")) {
-			 snapshot { onDependencyFailure = FailureAction.ADD_PROBLEM }
-		 }
-
-        // -- build number dependency
-//        dependency(AbsoluteId("TC_Trunk_BuildDistDocker")) {
-//            snapshot {
-//                reuseBuilds = ReuseBuilds.ANY
-//                onDependencyFailure = FailureAction.IGNORE
+//        triggers {
+//            finishBuildTrigger {
+//                // -- trigger once published into staging
+//                buildType = "${BuildAndPushHosted.BuildAndPushHosted.id}"
 //            }
 //        }
-	}
+//	dependencies {
+//        // Depends on publishing into staging
+//		 dependency(AbsoluteId("TC_Trunk_DockerImages_BuildAndPushHosted")) {
+//			 snapshot { onDependencyFailure = FailureAction.ADD_PROBLEM }
+//		 }
+//	}
     })
