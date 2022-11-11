@@ -23,6 +23,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 object image_validation: BuildType(
     {
         name = "Validation (post-push) of Docker images"
+        // TODO: Include version into build name pattern
         buildNumberPattern="test-%build.counter%"
 
         params {
@@ -30,10 +31,13 @@ object image_validation: BuildType(
             param("dockerImage.teamcity.buildNumber", "-")
         }
 
+
         steps {
             kotlinFile {
                 name = "Image Verification - %docker.deployRepository%teamcity-server:2022.10-linux"
                 path = "tool/automation/ImageValidation.kts"
+                // TODO: add execution mode to each kotlinFile {...}
+                executionMode = BuildStep.ExecutionMode.ALWAYS
                 arguments = "%docker.deployRepository%teamcity-server:2022.10-linux"
             }
 
@@ -130,12 +134,10 @@ object image_validation: BuildType(
             }
         }
 	dependencies {
-//		 dependency(AbsoluteId("TC_Trunk_DockerImages_push_hub_windows")) {
-//			 snapshot { onDependencyFailure = FailureAction.ADD_PROBLEM }
-//		 }
-//		 dependency(AbsoluteId("TC_Trunk_DockerImages_push_hub_linux")) {
-//			 snapshot { onDependencyFailure = FailureAction.ADD_PROBLEM }
-//		 }
+        // Depends on publishing into staging
+		 dependency(AbsoluteId("TC_Trunk_DockerImages_BuildAndPushHosted")) {
+			 snapshot { onDependencyFailure = FailureAction.ADD_PROBLEM }
+		 }
 
         // -- build number dependency
 //        dependency(AbsoluteId("TC_Trunk_BuildDistDocker")) {
